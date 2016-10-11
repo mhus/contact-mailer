@@ -1,16 +1,21 @@
 <?php
 
-header('Access-Control-Allow-Origin','*');
-header('Access-Control-Allow-Credentials','true');
-header('Access-Control-Allow-Headers','Content-Type');
-header('Access-Control-Allow-Methods','GET,POST');
-
 header('Content-Type: application/json');
 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Methods: GET,POST');
+
+// ----
+// Check Request
+
+// Allow GET Requests for testing purposes
 //if (!isset($_REQUEST['page']) ||$_SERVER['REQUEST_METHOD'] != "POST") {
 if (!isset($_REQUEST['page'])) {
     exit('{"msg":"Access denied (1)"}');
 } else {
+  // Load the configuration file
   $page = $_REQUEST['page'];
   if ( preg_match('=^[^/?*;:{}\\\\]+\.[^/?*;:{}\\\\]+$=', $page) )
     exit('{"msg":"Access denied (2)"}');
@@ -21,7 +26,7 @@ if (!isset($_REQUEST['page'])) {
   $config = array();
   include( $file );
 
-	// check fields
+  // check defined fields and content, send error message to the customer if not valid
   foreach ($config['fields'] as $f) {
     if (isset($config[$f . '_required'])) {
     	if (!isset($_REQUEST[$f]) || $_REQUEST[$f] == "" || isset($config[$f . '_regex']) && !preg_match($config[$f . '_regex'], $_REQUEST[$f]) ) {
@@ -30,8 +35,8 @@ if (!isset($_REQUEST['page'])) {
     }
   }
 	
-   
-  // Send Admin Mail
+  // ----
+  // Send mail notification to the owner of the webpage
 
   $header  = "From: " . $config['from'] . "\n";
   $header .= 'Content-type: text/html; charset=UTF-8' . "\n";
@@ -53,7 +58,9 @@ if (!isset($_REQUEST['page'])) {
 
   mail ($mailto,$subject,$msg,$header);
 
-  // Send Confirmation Mail
+  // ----
+  // Send Confirmation Mail to the user
+  
   $sendConfirm = false;
   if (isset($config['confirm']) && isset($_REQUEST['email']) && filter_var($_REQUEST['email'], FILTER_VALIDATE_EMAIL) !== false ) {
   
@@ -77,7 +84,10 @@ if (!isset($_REQUEST['page'])) {
     mail ($mailto,$subject,$msg,$header);
     $sendConfirm = true;
   }
-	
+
+  // -----	
+  // Send back the return message to the ajax call
+  
     exit('{"msg":"ok", "confirm":' . ($sendConfirm ? "true" : "false") 
     	. ( isset($config['success_href']) ? ',"href": "' . $config['success_href'] . '"' : '' ) . "}"
     );
