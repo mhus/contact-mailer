@@ -38,7 +38,13 @@ if (!isset($_REQUEST['page'])) {
   // ----
   // Send mail notification to the owner of the webpage
 
+  $replyer = null;
+  if (isset($config['replyToField']) && isset($_REQUEST[$config['replyToField']])) 
+    $replyer = htmlspecialchars( $_REQUEST[$config['replyToField']] );
+
   $header  = "From: " . $config['from'] . "\n";
+  if (isset($replyer))
+    $header .= "Reply-To: " . $replyer . "\n";
   $header .= 'Content-type: text/html; charset=UTF-8' . "\n";
 
   $subject = $config['subject'];
