@@ -3,7 +3,10 @@ function ajaxFormRequest(formid,page) {
 		var data = { 'page':''};
         for(var i = 0; i < elem.length; i++)
         {
-        	data[ elem[i].name ] = elem[i].value;
+			if (elem[i].type != 'radio')
+				data[ elem[i].name ] = elem[i].value;
+			else if (elem[i].checked)
+				data[ elem[i].name ] = elem[i].value;
         } 
         data['page'] = page;
 
