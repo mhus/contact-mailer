@@ -26,6 +26,7 @@ $config['to']='mike@mhus.de';
 $config['from']='webmaster@mhus.de';
 $config['subject']='Testseite';
 $config['fields']= array('name','email','problem');
+$config['replyToField'] = 'email';
 $config['success_href']='success.html';
 
 $config['email_required']='Bitte geben Sie eine EMail an';
